@@ -26,10 +26,10 @@ type PointGroup struct {
 //  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
 //  plot.AddPointGroup("Sample2", "points", []int32{1, 2, 4, 11})
 //  plot.SavePlot("1.png")
-func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (err error) {
+func (plot *plot) AddPointGroup(name string, style string, data interface{}) (err error) {
 	_, exists := plot.PointGroup[name]
 	if exists {
-		return &gnuplotError{fmt.Sprintf("A PointGroup with the name %s  already exists, please use another name of the curve or remove this curve before using another one with the same name.", name)}
+		return &gnuplotError{fmt.Sprintf("A PointGroup with the name %s already exists, please use another name of the curve or remove this curve before using another one with the same name.", name)}
 	}
 
 	curve := &PointGroup{name: name, dimensions: plot.dimensions, data: data, set: true}
@@ -281,7 +281,7 @@ func (plot *Plot) AddPointGroup(name string, style string, data interface{}) (er
 //  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
 //  plot.AddPointGroup("Sample2", "points", []int32{1, 2, 4, 11})
 //  plot.RemovePointGroup("Sample1")
-func (plot *Plot) RemovePointGroup(name string) {
+func (plot *plot) RemovePointGroup(name string) {
 	delete(plot.PointGroup, name)
 	plot.cleanplot()
 	for _, pointGroup := range plot.PointGroup {
@@ -300,7 +300,7 @@ func (plot *Plot) RemovePointGroup(name string) {
 //  plot, _ := glot.NewPlot(dimensions, persist, debug)
 //  plot.AddPointGroup("Sample1", "points", []int32{51, 8, 4, 11})
 //  plot.ResetPointGroupStyle("Sample1", "points")
-func (plot *Plot) ResetPointGroupStyle(name string, style string) (err error) {
+func (plot *plot) ResetPointGroupStyle(name string, style string) (err error) {
 	pointGroup, exists := plot.PointGroup[name]
 	if !exists {
 		return &gnuplotError{fmt.Sprintf("A curve with name %s does not exist.", name)}

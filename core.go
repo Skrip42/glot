@@ -76,7 +76,7 @@ func newPlotterProc(persist bool) (*plotterProcess, error) {
 //	if err != nil {
 //	  panic(err)
 //	}
-func (plot *Plot) Cmd(format string, a ...interface{}) error {
+func (plot *plot) Cmd(format string, a ...interface{}) error {
 	cmd := fmt.Sprintf(format, a...) + "\n"
 	n, err := io.WriteString(plot.proc.stdin, cmd)
 	if plot.debug {
@@ -94,7 +94,7 @@ func (plot *Plot) Cmd(format string, a ...interface{}) error {
 //
 //	fname := "foo.dat"
 //	p.CheckedCmd("plot %s", fname)
-func (plot *Plot) CheckedCmd(format string, a ...interface{}) {
+func (plot *plot) CheckedCmd(format string, a ...interface{}) {
 	err := plot.Cmd(format, a...)
 	if err != nil {
 		_ = fmt.Errorf("** err: %v\n", err)
@@ -111,7 +111,7 @@ type tmpfilesDb map[string]*os.File
 //	p, err := gnuplot.NewPlotter(...)
 //	if err != nil { /* handle error */ }
 //	defer p.Close()
-func (plot *Plot) Close() (err error) {
+func (plot *plot) Close() (err error) {
 	if plot.proc != nil && plot.proc.handle != nil {
 		plot.proc.stdin.Close()
 		err = plot.proc.handle.Wait()
@@ -120,7 +120,7 @@ func (plot *Plot) Close() (err error) {
 	return err
 }
 
-func (plot *Plot) cleanplot() (err error) {
+func (plot *plot) cleanplot() (err error) {
 	plot.tmpfiles = make(tmpfilesDb)
 	plot.nplots = 0
 	return err
@@ -131,7 +131,7 @@ func (plot *Plot) cleanplot() (err error) {
 // Usage
 //
 //	plot.ResetPlot()
-func (plot *Plot) ResetPlot() (err error) {
+func (plot *plot) ResetPlot() (err error) {
 	plot.cleanplot()
 	plot.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
 	return err
