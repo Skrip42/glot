@@ -7,69 +7,74 @@ import (
 // SetTitle sets the title for the plot
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-func (plot *Plot) SetTitle(title string) error {
+//
+//	dimensions := 3
+//	persist := false
+//	debug := false
+//	plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	plot.SetTitle("Test Results")
+func (plot *plot) SetTitle(title string) error {
 	return plot.Cmd(fmt.Sprintf("set title \"%s\" ", title))
 }
 
 // SetXLabel changes the label for the x-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetXLabel("X-Axis")
-func (plot *Plot) SetXLabel(label string) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetXLabel("X-Axis")
+func (plot *plot) SetXLabel(label string) error {
 	return plot.Cmd(fmt.Sprintf("set xlabel '%s'", label))
 }
 
 // SetYLabel changes the label for the y-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetYLabel("Y-Axis")
-func (plot *Plot) SetYLabel(label string) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetYLabel("Y-Axis")
+func (plot *plot) SetYLabel(label string) error {
 	return plot.Cmd(fmt.Sprintf("set ylabel '%s'", label))
 }
 
 // SetZLabel changes the label for the z-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetZLabel("Z-Axis")
-func (plot *Plot) SetZLabel(label string) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetZLabel("Z-Axis")
+func (plot *plot) SetZLabel(label string) error {
 	return plot.Cmd(fmt.Sprintf("set zlabel '%s'", label))
 }
 
 // SetLabels Functions helps to set labels for x, y, z axis  simultaneously
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetLabels("X-axis","Y-Axis","Z-Axis")
-func (plot *Plot) SetLabels(labels ...string) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetLabels("X-axis","Y-Axis","Z-Axis")
+func (plot *plot) SetLabels(labels ...string) error {
 	ndims := len(labels)
 	if ndims > 3 || ndims <= 0 {
 		return &gnuplotError{fmt.Sprintf("invalid number of dims '%v'", ndims)}
@@ -104,56 +109,60 @@ func (plot *Plot) SetLabels(labels ...string) error {
 // SetXrange changes the label for the x-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetXrange(-2,2)
-func (plot *Plot) SetXrange(start int, end int) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetXrange(-2,2)
+func (plot *plot) SetXrange(start int, end int) error {
 	return plot.Cmd(fmt.Sprintf("set xrange [%d:%d]", start, end))
 }
 
 // SetLogscale changes the label for the x-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.SetYrange(-2, 18)
-//  plot.AddPointGroup("rates", "circle", [][]float64{{2, 4, 8, 16, 32}, {4, 7, 4, 10, 3}})
-//  plot.SetLogscale("x", 2)
-func (plot *Plot) SetLogscale(axis string, base int) error {
+//
+//	dimensions := 3
+//	persist := false
+//	debug := false
+//	plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	plot.SetYrange(-2, 18)
+//	plot.AddPointGroup("rates", "circle", [][]float64{{2, 4, 8, 16, 32}, {4, 7, 4, 10, 3}})
+//	plot.SetLogscale("x", 2)
+func (plot *plot) SetLogscale(axis string, base int) error {
 	return plot.Cmd(fmt.Sprintf("set logscale %s %d", axis, base))
 }
 
 // SetYrange changes the label for the y-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetYrange(-2,2)
-func (plot *Plot) SetYrange(start int, end int) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetYrange(-2,2)
+func (plot *plot) SetYrange(start int, end int) error {
 	return plot.Cmd(fmt.Sprintf("set yrange [%d:%d]", start, end))
 }
 
 // SetZrange changes the label for the z-axis
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetZrange(-2,2)
-func (plot *Plot) SetZrange(start int, end int) error {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetZrange(-2,2)
+func (plot *plot) SetZrange(start int, end int) error {
 	return plot.Cmd(fmt.Sprintf("set zrange [%d:%d]", start, end))
 }
 
@@ -162,15 +171,16 @@ func (plot *Plot) SetZrange(start int, end int) error {
 // of the same plot can be saved.
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetZrange(-2,2)
-//  plot.SavePlot("1.jpeg")
-func (plot *Plot) SavePlot(filename string) (err error) {
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetZrange(-2,2)
+//	 plot.SavePlot("1.jpeg")
+func (plot *plot) SavePlot(filename string) (err error) {
 	if plot.nplots == 0 {
 		return &gnuplotError{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
 	}
@@ -187,16 +197,18 @@ func (plot *Plot) SavePlot(filename string) (err error) {
 // of the same plot can be saved.
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
-//  plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
-//  plot.SetTitle("Test Results")
-// 	plot.SetFormat("pdf")
-//  plot.SavePlot("1.pdf")
+//
+//	 dimensions := 3
+//	 persist := false
+//	 debug := false
+//	 plot, _ := glot.NewPlot(dimensions, persist, debug)
+//	 plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
+//	 plot.SetTitle("Test Results")
+//		plot.SetFormat("pdf")
+//	 plot.SavePlot("1.pdf")
+//
 // NOTE: png is default format for saving files.
-func (plot *Plot) SetFormat(newformat string) error {
+func (plot *plot) SetFormat(newformat string) error {
 	allowed := []string{
 		"png", "pdf"}
 	for _, s := range allowed {

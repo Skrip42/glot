@@ -22,7 +22,50 @@ import (
 // the time of plot construction.
 // The Pointgroups can be dynamically added and removed from a plot
 // And style changes can also be made dynamically.
-type Plot struct {
+// Plot is an interface for plotting data in 1, 2 or 3 dimensions
+type Plot interface {
+	// Cmd sends a command to the underlying gnuplot process
+	Cmd(format string, a ...interface{}) error
+
+	// AddPointGroup adds a new point group with the given name and style
+	AddPointGroup(name string, style string, points interface{}) error
+
+	// RemovePointGroup helps to remove a particular point group from the plot.
+	RemovePointGroup(name string)
+
+	// ResetPointGroupStyle helps to reset the style of a particular point group in a plot.
+	ResetPointGroupStyle(name string, style string) (err error)
+
+	// SetTitle sets the title for the plot
+	SetTitle(title string) error
+
+	// SetXLabel sets the label for the x-axis
+	SetXLabel(label string) error
+
+	// SetYLabel sets the label for the y-axis
+	SetYLabel(label string) error
+
+	// SetZLabel sets the label for the z-axis
+	SetZLabel(label string) error
+
+	// SetLabels sets labels for x, y, z axes simultaneously
+	SetLabels(labels ...string) error
+
+	// SetXrange sets the range for the x-axis
+	SetXrange(start int, end int) error
+
+	// SetFormat sets the output format (png, pdf, etc)
+	SetFormat(format string) error
+
+	// AddFunc2d is used to make a 2-d plot of the format y = Function(x)
+	AddFunc2d(name string, style string, x []float64, fct Func2d) error
+
+	// AddFunc3d is used to make a 3-d plot of the format z = Function(x,y)
+	AddFunc3d(name string, style string, x []float64, y []float64, fct Func3d) error
+}
+
+// plot implements the Plot interface
+type plot struct {
 	proc       *plotterProcess
 	debug      bool
 	plotcmd    string
@@ -38,16 +81,19 @@ type Plot struct {
 // NewPlot Function makes a new plot with the specified dimensions.
 //
 // Usage
-//  dimensions := 3
-//  persist := false
-//  debug := false
-//  plot, _ := glot.NewPlot(dimensions, persist, debug)
+//
+//	dimensions := 3
+//	persist := false
+//	debug := false
+//	plot, _ := glot.NewPlot(dimensions, persist, debug)
+//
 // Variable definitions
-//  dimensions  :=> refers to the dimensions of the plot.
-//  debug       :=> can be used by developers to check the actual commands sent to gnu plot.
-//  persist     :=> used to make the gnu plot window stay open.
-func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
-	p := &Plot{proc: nil, debug: debug, plotcmd: "plot",
+//
+//	dimensions  :=> refers to the dimensions of the plot.
+//	debug       :=> can be used by developers to check the actual commands sent to gnu plot.
+//	persist     :=> used to make the gnu plot window stay open.
+func NewPlot(dimensions int, persist, debug bool) (Plot, error) {
+	p := &plot{proc: nil, debug: debug, plotcmd: "plot",
 		nplots: 0, dimensions: dimensions, style: "points", format: "png"}
 	p.PointGroup = make(map[string]*PointGroup) // Adding a mapping between a curve name and a curve
 	p.tmpfiles = make(tmpfilesDb)
@@ -63,7 +109,7 @@ func NewPlot(dimensions int, persist, debug bool) (*Plot, error) {
 	return p, nil
 }
 
-func (plot *Plot) plotX(PointGroup *PointGroup) error {
+func (plot *plot) plotX(PointGroup *PointGroup) error {
 	f, err := ioutil.TempFile(os.TempDir(), gGnuplotPrefix)
 	if err != nil {
 		return err
@@ -92,7 +138,7 @@ func (plot *Plot) plotX(PointGroup *PointGroup) error {
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) plotXY(PointGroup *PointGroup) error {
+func (plot *plot) plotXY(PointGroup *PointGroup) error {
 	x := PointGroup.castedData.([][]float64)[0]
 	y := PointGroup.castedData.([][]float64)[1]
 	npoints := min(len(x), len(y))
@@ -128,7 +174,7 @@ func (plot *Plot) plotXY(PointGroup *PointGroup) error {
 	return plot.Cmd(line)
 }
 
-func (plot *Plot) plotXYZ(points *PointGroup) error {
+func (plot *plot) plotXYZ(points *PointGroup) error {
 	x := points.castedData.([][]float64)[0]
 	y := points.castedData.([][]float64)[1]
 	z := points.castedData.([][]float64)[2]
