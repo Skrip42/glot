@@ -2,6 +2,7 @@ package glot
 
 import (
 	"fmt"
+	"strconv"
 )
 
 // SetTitle sets the title for the plot
@@ -15,7 +16,7 @@ import (
 //	plot.AddPointGroup("Sample 1", "lines", []float64{2, 3, 4, 1})
 //	plot.SetTitle("Test Results")
 func (plot *plot) SetTitle(title string) error {
-	return plot.Cmd(fmt.Sprintf("set title \"%s\" ", title))
+	return plot.cmd(fmt.Sprintf("set title \"%s\" ", title))
 }
 
 // SetXLabel changes the label for the x-axis
@@ -30,7 +31,7 @@ func (plot *plot) SetTitle(title string) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetXLabel("X-Axis")
 func (plot *plot) SetXLabel(label string) error {
-	return plot.Cmd(fmt.Sprintf("set xlabel '%s'", label))
+	return plot.cmd(fmt.Sprintf("set xlabel '%s'", label))
 }
 
 // SetYLabel changes the label for the y-axis
@@ -45,7 +46,7 @@ func (plot *plot) SetXLabel(label string) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetYLabel("Y-Axis")
 func (plot *plot) SetYLabel(label string) error {
-	return plot.Cmd(fmt.Sprintf("set ylabel '%s'", label))
+	return plot.cmd(fmt.Sprintf("set ylabel '%s'", label))
 }
 
 // SetZLabel changes the label for the z-axis
@@ -60,7 +61,11 @@ func (plot *plot) SetYLabel(label string) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetZLabel("Z-Axis")
 func (plot *plot) SetZLabel(label string) error {
-	return plot.Cmd(fmt.Sprintf("set zlabel '%s'", label))
+	return plot.cmd(fmt.Sprintf("set zlabel '%s'", label))
+}
+
+func (plot *plot) SetGrid() error {
+	return plot.cmd("set grid")
 }
 
 // SetLabels Functions helps to set labels for x, y, z axis  simultaneously
@@ -79,28 +84,12 @@ func (plot *plot) SetLabels(labels ...string) error {
 	if ndims > 3 || ndims <= 0 {
 		return &gnuplotError{fmt.Sprintf("invalid number of dims '%v'", ndims)}
 	}
-	var err error
+	slabelFunc := []func(string) error{plot.SetXLabel, plot.SetYLabel, plot.SetZLabel}
 
 	for i, label := range labels {
-		switch i {
-		case 0:
-			ierr := plot.SetXLabel(label)
-			if ierr != nil {
-				err = ierr
-				return err
-			}
-		case 1:
-			ierr := plot.SetYLabel(label)
-			if ierr != nil {
-				err = ierr
-				return err
-			}
-		case 2:
-			ierr := plot.SetZLabel(label)
-			if ierr != nil {
-				err = ierr
-				return err
-			}
+		err := slabelFunc[i](label)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -118,7 +107,7 @@ func (plot *plot) SetLabels(labels ...string) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetXrange(-2,2)
 func (plot *plot) SetXrange(start int, end int) error {
-	return plot.Cmd(fmt.Sprintf("set xrange [%d:%d]", start, end))
+	return plot.cmd(fmt.Sprintf("set xrange [%d:%d]", start, end))
 }
 
 // SetLogscale changes the label for the x-axis
@@ -133,7 +122,7 @@ func (plot *plot) SetXrange(start int, end int) error {
 //	plot.AddPointGroup("rates", "circle", [][]float64{{2, 4, 8, 16, 32}, {4, 7, 4, 10, 3}})
 //	plot.SetLogscale("x", 2)
 func (plot *plot) SetLogscale(axis string, base int) error {
-	return plot.Cmd(fmt.Sprintf("set logscale %s %d", axis, base))
+	return plot.cmd(fmt.Sprintf("set logscale %s %d", axis, base))
 }
 
 // SetYrange changes the label for the y-axis
@@ -148,7 +137,7 @@ func (plot *plot) SetLogscale(axis string, base int) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetYrange(-2,2)
 func (plot *plot) SetYrange(start int, end int) error {
-	return plot.Cmd(fmt.Sprintf("set yrange [%d:%d]", start, end))
+	return plot.cmd(fmt.Sprintf("set yrange [%d:%d]", start, end))
 }
 
 // SetZrange changes the label for the z-axis
@@ -163,7 +152,7 @@ func (plot *plot) SetYrange(start int, end int) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetZrange(-2,2)
 func (plot *plot) SetZrange(start int, end int) error {
-	return plot.Cmd(fmt.Sprintf("set zrange [%d:%d]", start, end))
+	return plot.cmd(fmt.Sprintf("set zrange [%d:%d]", start, end))
 }
 
 // SavePlot function is used to save the plot at this point.
@@ -180,15 +169,17 @@ func (plot *plot) SetZrange(start int, end int) error {
 //	 plot.SetTitle("Test Results")
 //		plot.SetZrange(-2,2)
 //	 plot.SavePlot("1.jpeg")
-func (plot *plot) SavePlot(filename string) (err error) {
-	if plot.nplots == 0 {
+func (plot *plot) SavePlot(filename string, weight, height int) error {
+	if plot.nPlots == 0 {
 		return &gnuplotError{fmt.Sprintf("This plot has 0 curves and therefore its a redundant plot and it can't be printed.")}
 	}
-	outputFormat := "set terminal " + plot.format
-	plot.CheckedCmd(outputFormat)
-	outputFileCommand := "set output" + "'" + filename + "'"
-	plot.CheckedCmd(outputFileCommand)
-	plot.CheckedCmd("replot  ")
+	outputFormat := "set terminal " + string(plot.format) +
+		" size " + strconv.Itoa(weight) + ", " + strconv.Itoa(height)
+
+	_ = plot.cmd(outputFormat)
+	outputFileCommand := "set output " + "'" + filename + "'"
+	_ = plot.cmd(outputFileCommand)
+	_ = plot.cmd("replot  ")
 	return nil
 }
 
@@ -208,17 +199,11 @@ func (plot *plot) SavePlot(filename string) (err error) {
 //	 plot.SavePlot("1.pdf")
 //
 // NOTE: png is default format for saving files.
-func (plot *plot) SetFormat(newformat string) error {
-	allowed := []string{
-		"png", "pdf"}
-	for _, s := range allowed {
-		if newformat == s {
-			plot.format = newformat
-			return nil
-		}
-	}
-	fmt.Printf("** Format '%v' not in allowed list %v\n", newformat, allowed)
-	fmt.Printf("** default to 'png'\n")
-	err := &gnuplotError{fmt.Sprintf("invalid format '%s'", newformat)}
-	return err
+func (plot *plot) SetFormat(newformat Format) error {
+	plot.format = newformat
+	return nil
+}
+
+func (plot *plot) SetKeyOutside() error {
+	return plot.cmd("set key outside")
 }
